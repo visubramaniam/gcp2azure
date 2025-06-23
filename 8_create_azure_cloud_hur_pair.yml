@@ -11,57 +11,57 @@
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
-          --host "{{ cloud_storage_address }}" \
-          --user "{{ cloud_vault_storage_username }}" \
-          --password "{{ cloud_vault_storage_secret }}" \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
           storage_controller_show \
-          --id "{{ storage_controller_id }}" |\
+          --id "{{ az_storage_controller_id }}" |\
           grep "^Udp" | tr -d " " | cut -d":" -f2 | tr -d "\n"
       register: udp_port_out
       failed_when: udp_port_out.rc != 0
 
     - ansible.builtin.set_fact:
-        udp_port: "{{ udp_port_out.stdout.strip() }}"
+        az_udp_port: "{{ udp_port_out.stdout.strip() }}"
 
     - name: Get Path Group ID for HORCM config file
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
-          --host "{{ cloud_storage_address }}" \
-          --user "{{ cloud_vault_storage_username }}" \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
           --password "{{ cloud_vault_storage_secret }}" \
           remotepath_group_list \
-          --local_storage_controller_id "{{ storage_controller_id }}" |\
+          --local_storage_controller_id "{{ az_storage_controller_id }}" |\
           grep "^Path" | tr -d " " | cut -d":" -f2 | tr -d "\n"
       register: path_grp_id_out
       failed_when: path_grp_id_out.rc != 0
 
     - ansible.builtin.set_fact:
-        path_grp_id: "{{ path_grp_id_out.stdout.strip() }}"
+        az_path_grp_id: "{{ path_grp_id_out.stdout.strip() }}"
 
     - name: Get Active Storage Node ID
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
-          --host "{{ cloud_storage_address }}" \
-          --user "{{ cloud_vault_storage_username }}" \
-          --password "{{ cloud_vault_storage_secret }}" \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
           storage_controller_show \
-          --id "{{ storage_controller_id }}" |\
+          --id "{{ az_storage_controller_id }}" |\
           grep "^Active" | tr -d " " | cut -d":" -f2 | tr -d "\n"
       register: active_node_id_out
       failed_when: active_node_id_out.rc != 0
 
     - ansible.builtin.set_fact:
-        active_node_id: "{{ active_node_id_out.stdout.strip() }}"
+        az_active_node_id: "{{ active_node_id_out.stdout.strip() }}"
 
     - name: Get Active Storage Node ID Control IP
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
-          --host "{{ cloud_storage_address }}" \
-          --user "{{ cloud_vault_storage_username }}" \
-          --password "{{ cloud_vault_storage_secret }}" \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
           storage_node_show \
           --id "{{ active_node_id }}" |\
           grep "^Control" | tr -d " " | cut -d":" -f2 | tr -d "\n"
@@ -69,7 +69,7 @@
       failed_when: active_node_ip_out.rc != 0
 
     - ansible.builtin.set_fact:
-        active_node_ip: "{{ active_node_ip_out.stdout.strip() }}"
+        az_active_node_ip: "{{ active_node_ip_out.stdout.strip() }}"
 
     - name: Check if horcm100 file exists
       ansible.builtin.stat:
@@ -140,7 +140,7 @@
 
 
     - name: Create cloud HUR PAIR
-      ansible.builtin.shell: "/HORCM/usr/bin/paircreate -g TCDEMO -f async 10 -jp 10 -js 10 -vl -I100"
+      ansible.builtin.shell: "/HORCM/usr/bin/paircreate -g TCDEMO -f async {{ az_ctg_id }} -jp {{ onprem_journal_id }} -js {{ az_cloud_journal_number }} -vl -I100"
       register: ret
       failed_when: >
         (ret.stderr != '') or
@@ -153,8 +153,8 @@
         (ret.stderr != '') or
         (ret.rc != 0)
 
-    - name: Wait for the pair creation to completet HUR PAIR 
-      ansible.builtin.shell: "/HORCM/usr/bin/pairsplit -g TCDEMO -rw -I100"
+    - name: Wait for the pair creation to complete HUR PAIR 
+      ansible.builtin.shell: "/HORCM/usr/bin/pairsplit -g TCDEMO -S -I100"
       register: ret
       failed_when: >
         (ret.stderr != '') or
