@@ -29,7 +29,7 @@
           port: "{{ port1_name }}"
           iqn_initiators:
             - iqn: "{{ port1_iqn }}"
-              nick_name: "{{ port1_nickname }}"
+              nick_name: "port1_nickname"
       register: result
 
     - name: Debug the result variable
@@ -47,7 +47,7 @@
           port: "{{ port2_name }}"
           iqn_initiators:
             - iqn: "{{ port2_iqn }}"
-              nick_name: "{{ port2_nickname }}"
+              nick_name: "port2_nickname"
       register: result
 
     - name: Debug the result variable
