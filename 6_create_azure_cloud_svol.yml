@@ -64,3 +64,41 @@
       ansible.builtin.set_stats:
         data:
           az_svol_ldev_id: "{{ volume_id.stdout.strip() }}"
+
+    - name: Get Volume Unique ID
+      ansible.builtin.shell: |
+        set -o pipefail
+        hsds --ignore_certificate_errors \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
+          volume_show \
+          --id_name "{{ az_cloud_vol_name }}" |\
+          grep "^Id" | tr -d " " | cut -d":" -f2 | tr -d "\n"
+      register: volume_uniq_id
+      until: volume_id.rc == 0
+      retries: 10
+      delay: 30
+
+    - name: Echo volume_uniq_id
+      ansible.builtin.debug:
+        msg: "{{ volume_uniq_id.stdout.strip() }}"
+
+    - name: Set az_volume_uniq_id_out fact in stats
+      ansible.builtin.set_stats:
+        data:
+          az_volume_uniq_id: "{{ volume_uniq_id.stdout.strip() }}"
+
+    - name: Attach volume
+      ansible.builtin.shell: |
+        set -o pipefail
+        hsds --ignore_certificate_errors \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
+          volume_server_connection_create \
+          --volume_id "{{ az_volume_uniq_id }}" \
+          --server_id "e566f269-5ec9-4937-89f0-0c20cf88ad3b" \
+          grep -i "^Job" | tr -d " " | cut -d":" -f2 | tr -d "\n"
+      register: job_id
+
