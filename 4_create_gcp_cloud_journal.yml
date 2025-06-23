@@ -18,7 +18,7 @@
       hitachivantara.vspone_block.sds_block.hv_sds_block_volume_facts:
         connection_info: "{{ connection_info }}"
         spec:
-          names: ["MYSQL-PVOL_00"]
+          names: ["MySQL-PVOL_00"]
       register: result
 
     - name: Debug the result variable
