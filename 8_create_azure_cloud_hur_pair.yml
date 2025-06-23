@@ -72,47 +72,47 @@
     - ansible.builtin.set_fact:
         az_active_node_ip: "{{ active_node_ip_out.stdout.strip() }}"
 
-    - name: Check if horcm100 file exists
+    - name: Check if horcm110 file exists
       ansible.builtin.stat:
-        path: /tmp/horcm100.conf.j2
-      register: horcm100_file
+        path: /tmp/horcm110.conf.j2
+      register: horcm110_file
 
-    - name: Check if horcm101 file exists
+    - name: Check if horcm111 file exists
       ansible.builtin.stat:
-        path: /tmp/horcm101.conf.j2
-      register: horcm101_file
+        path: /tmp/horcm111.conf.j2
+      register: horcm111_file
 
-    - name: Modify horcm100.conf.tmpl
+    - name: Modify horcm110.conf.tmpl
       ansible.builtin.template:
-        src: /tmp/horcm100.conf.j2
-        dest: /HORCM/etc/horcm100.conf
+        src: /tmp/horcm110.conf.j2
+        dest: /HORCM/etc/horcm110.conf
         mode: '0777'
 
-    - name: Modify horcm101.conf.tmpl
+    - name: Modify horcm111.conf.tmpl
       ansible.builtin.template:
-        src: /tmp/horcm101.conf.j2
-        dest: /HORCM/etc/horcm101.conf
+        src: /tmp/horcm111.conf.j2
+        dest: /HORCM/etc/horcm111.conf
         mode: '0777'
 
-    - name: Display horcm100.conf contents
-      ansible.builtin.shell: cat /HORCM/etc/horcm100.conf
-      register: horcm100_output
+    - name: Display horcm110.conf contents
+      ansible.builtin.shell: cat /HORCM/etc/horcm110.conf
+      register: horcm110_output
 
     - name: Print to console
       ansible.builtin.debug:
-        msg: "{{ horcm100_output.stdout_lines }}"
+        msg: "{{ horcm110_output.stdout_lines }}"
 
-    - name: Display horcm101.conf contents
-      ansible.builtin.shell: cat /HORCM/etc/horcm101.conf
-      register: horcm101_output
+    - name: Display horcm111.conf contents
+      ansible.builtin.shell: cat /HORCM/etc/horcm111.conf
+      register: horcm111_output
 
     - name: Print to console
       ansible.builtin.debug:
-        msg: "{{ horcm101_output.stdout_lines }}"
+        msg: "{{ horcm111_output.stdout_lines }}"
 
-    - name: Start horcm100
+    - name: Start horcm110
       ansible.builtin.shell: |
-        HORCMINST=100 HORCM_CONF=/HORCM/etc/horcm100.conf /HORCM/usr/bin/horcmstart.sh
+        HORCMINST=110 HORCM_CONF=/HORCM/etc/horcm110.conf /HORCM/usr/bin/horcmstart.sh
       register: ret
       failed_when: >
         ("Failed" in ret.stdout) or
@@ -123,39 +123,39 @@
       retries: 10
       delay: 30
 
-    - name: Start horcm101
+    - name: Start horcm111
       ansible.builtin.shell: |
-        HORCMINST=101 HORCM_CONF=/HORCM/etc/horcm101.conf /HORCM/usr/bin/horcmstart.sh
+        HORCMINST=111 HORCM_CONF=/HORCM/etc/horcm111.conf /HORCM/usr/bin/horcmstart.sh
       register: ret
       failed_when: >
         (ret.stderr != '') or
         (ret.rc != 0)
-      when: horcm101_file.stat.exists
+      when: horcm111_file.stat.exists
       until: ret.rc == 0
       retries: 10
       delay: 30
 
     - name: Login to the storage system
       ansible.builtin.shell: |
-        /HORCM/usr/bin/raidcom -login "{{ vault_storage_username }}" "{{ vault_storage_secret }}" -I100
+        /HORCM/usr/bin/raidcom -login "{{ vault_storage_username }}" "{{ vault_storage_secret }}" -I110
 
 
     - name: Create cloud HUR PAIR
-      ansible.builtin.shell: "/HORCM/usr/bin/paircreate -g TCDEMO -f async {{ az_ctg_id }} -jp {{ onprem_journal_id }} -js {{ az_cloud_journal_number }} -vl -I100"
+      ansible.builtin.shell: "/HORCM/usr/bin/paircreate -g TCDEMO -f async {{ az_ctg_id }} -jp {{ onprem_journal_id }} -js {{ az_cloud_journal_number }} -vl -I110"
       register: ret
       failed_when: >
         (ret.stderr != '') or
         (ret.rc != 0)
 
     - name: Wait for the pair creation to complete 
-      ansible.builtin.shell: "/HORCM/usr/bin/pairevtwait -g TCDEMO -s pair -t 3600 -I100"
+      ansible.builtin.shell: "/HORCM/usr/bin/pairevtwait -g TCDEMO -s pair -t 3600 -I110"
       register: ret
       failed_when: >
         (ret.stderr != '') or
         (ret.rc != 0)
 
     - name: Wait for the pair creation to complete HUR PAIR 
-      ansible.builtin.shell: "/HORCM/usr/bin/pairsplit -g TCDEMO -S -I100"
+      ansible.builtin.shell: "/HORCM/usr/bin/pairsplit -g TCDEMO -S -I110"
       register: ret
       failed_when: >
         (ret.stderr != '') or
