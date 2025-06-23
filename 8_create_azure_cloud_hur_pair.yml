@@ -118,7 +118,7 @@
         ("Failed" in ret.stdout) or
         (ret.stderr != '') or
         (ret.rc != 0)
-      when: horcm100_file.stat.exists
+      when: horcm110_file.stat.exists
       until: ret.rc == 0
       retries: 10
       delay: 30
