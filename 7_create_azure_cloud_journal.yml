@@ -23,7 +23,7 @@
           --base_name_for_name "{{ az_cloud_journal_name }}" \
           --storage_controller_id "{{ az_storage_controller_id }}" \
           --capacity 102400 \
-          --pool_id_name "{{ cloud_pool_name }}" | \
+          --pool_id_name "{{ az_cloud_pool_name }}" | \
           grep -i "^Job" | tr -d " " | cut -d":" -f2 | tr -d "\n"
       when: not journal_volume_file.stat.exists
       register: job_id
@@ -41,8 +41,8 @@
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
-          --host "{{ cloud_storage_address }}" \
-          --user "{{ cloud_vault_storage_username }}" \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
           --password "{{ cloud_vault_storage_secret }}" \
           job_list \
           --ids "{{ job_id_out }}" |\
@@ -69,7 +69,7 @@
         hsds --ignore_certificate_errors \
           --host "{{ az_cloud_storage_address }}" \
           --user "{{ az_cloud_vault_storage_username }}" \
-          --password "{{ cloud_vault_storage_secret }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
           journal_create \
           --volume_ids "{{ volume_id_out }}" \
           --journal_number "{{ az_cloud_journal_number }}"
