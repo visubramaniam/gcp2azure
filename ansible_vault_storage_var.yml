@@ -9,7 +9,7 @@ gcp_cloud_storage_serial: 237167
 gcp_cloud_storage_address: 172.19.1.211
 gcp_cloud_vault_storage_username: ansible
 gcp_cloud_vault_storage_secret: Hitachi123
-azure_cloud_storage_serial: 264970
-azure_cloud_storage_address: 172.18.1.9
-azure_cloud_vault_storage_username: ansible
-azure_cloud_vault_storage_secret: Hitachi123
+az_cloud_storage_serial: 264970
+az_cloud_storage_address: 172.18.1.9
+az_cloud_vault_storage_username: ansible
+az_cloud_vault_storage_secret: Hitachi123
