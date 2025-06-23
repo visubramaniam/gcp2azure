@@ -11,9 +11,9 @@
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
-          --host "{{ cloud_storage_address }}" \
-          --user "{{ cloud_vault_storage_username }}" \
-          --password "{{ cloud_vault_storage_secret }}" \
+          --host "{{ gcp_cloud_storage_address }}" \
+          --user "{{ gcp_cloud_vault_storage_username }}" \
+          --password "{{ gcp_cloud_vault_storage_secret }}" \
           storage_controller_show \
           --id "{{ storage_controller_id }}" |\
           grep "^Udp" | tr -d " " | cut -d":" -f2 | tr -d "\n"
@@ -27,9 +27,9 @@
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
-          --host "{{ cloud_storage_address }}" \
-          --user "{{ cloud_vault_storage_username }}" \
-          --password "{{ cloud_vault_storage_secret }}" \
+          --host "{{ gcp_cloud_storage_address }}" \
+          --user "{{ gcp_cloud_vault_storage_username }}" \
+          --password "{{ gcp_cloud_vault_storage_secret }}" \
           remotepath_group_list \
           --local_storage_controller_id "{{ storage_controller_id }}" |\
           grep "^Path" | tr -d " " | cut -d":" -f2 | tr -d "\n"
@@ -43,9 +43,9 @@
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
-          --host "{{ cloud_storage_address }}" \
-          --user "{{ cloud_vault_storage_username }}" \
-          --password "{{ cloud_vault_storage_secret }}" \
+          --host "{{ gcp_cloud_storage_address }}" \
+          --user "{{ gcp_cloud_vault_storage_username }}" \
+          --password "{{ gcp_cloud_vault_storage_secret }}" \
           storage_controller_show \
           --id "{{ storage_controller_id }}" |\
           grep "^Active" | tr -d " " | cut -d":" -f2 | tr -d "\n"
@@ -59,9 +59,9 @@
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
-          --host "{{ cloud_storage_address }}" \
-          --user "{{ cloud_vault_storage_username }}" \
-          --password "{{ cloud_vault_storage_secret }}" \
+          --host "{{ gcp_cloud_storage_address }}" \
+          --user "{{ gcp_cloud_vault_storage_username }}" \
+          --password "{{ gcp_cloud_vault_storage_secret }}" \
           storage_node_show \
           --id "{{ active_node_id }}" |\
           grep "^Control" | tr -d " " | cut -d":" -f2 | tr -d "\n"
@@ -136,11 +136,11 @@
 
     - name: Login to the storage system
       ansible.builtin.shell: |
-        /HORCM/usr/bin/raidcom -login "{{ cloud_vault_storage_username }}" "{{ cloud_vault_storage_secret }}" -I101
+        /HORCM/usr/bin/raidcom -login "{{ gcp_cloud_vault_storage_username }}" "{{ gcp_cloud_vault_storage_secret }}" -I101
 
 
     - name: Create cloud HUR PAIR
-      ansible.builtin.shell: /HORCM/usr/bin/paircreate -g TCDEMO -f async "{{ ctg_id }}" -jp "{{ onprem_journal_id }}" -js "{{ cloud_journal_number }}" -vl -I101
+      ansible.builtin.shell: /HORCM/usr/bin/paircreate -g TCDEMO -f async "{{ gcp_ctg_id }}" -jp "{{ onprem_journal_id }}" -js "{{ gcp_cloud_journal_number }}" -vl -I101
       register: ret
       failed_when: >
         (ret.stderr != '') or
@@ -154,7 +154,7 @@
         (ret.rc != 0)
 
     - name: Split HUR PAIR 
-      ansible.builtin.shell: "/HORCM/usr/bin/pairsplit -g TCDEMO -rw -I101"
+      ansible.builtin.shell: "/HORCM/usr/bin/pairsplit -g TCDEMO -S -I101"
       register: ret
       failed_when: >
         (ret.stderr != '') or
