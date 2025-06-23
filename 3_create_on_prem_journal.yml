@@ -34,6 +34,10 @@
       ansible.builtin.debug:
         var: result
 
+    - name: Pause for 1 minutes to finish ldev creation
+      ansible.builtin.pause:
+        minutes: 1
+ 
     ####################################################################
     # Task 1 : Create a Journal Volume using required details
     ####################################################################

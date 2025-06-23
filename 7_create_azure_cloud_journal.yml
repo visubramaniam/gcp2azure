@@ -43,7 +43,7 @@
         hsds --ignore_certificate_errors \
           --host "{{ az_cloud_storage_address }}" \
           --user "{{ az_cloud_vault_storage_username }}" \
-          --password "{{ cloud_vault_storage_secret }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
           job_list \
           --ids "{{ job_id_out }}" |\
           grep "Value" | tr -d " " | cut -d":" -f2 | tr -d "\n"
