@@ -36,7 +36,8 @@
       register: path_grp_id_out
       failed_when: path_grp_id_out.rc != 0
 
-    - ansible.builtin.set_fact:
+    - name: Set Azure Path Group ID fact
+      ansible.builtin.set_fact:
         az_path_grp_id: "{{ path_grp_id_out.stdout.strip() }}"
 
     - name: Get Active Storage Node ID
